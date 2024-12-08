@@ -2,6 +2,10 @@ import pandas as pd
 import json
 from sklearn.utils import shuffle
 
+# 读取原始预训练模型的词汇表
+with open('./data/vocab.json', 'r', encoding='utf-8') as f:
+    vocab = json.load(f)
+
 # 读取数据
 data = pd.read_csv('./data/ChnSentiCorp_htl_all.csv')
 
@@ -28,24 +32,21 @@ train_data = pd.concat([train_data_0, train_data_1], ignore_index=True)
 # 保存训练集
 train_data.to_csv('./data/emotion_train.csv', index=False)
 
-# 创建词汇表
-# 将所有元素转换为字符串
+# 扩展词汇表：将情感数据集中的新字符添加到现有词汇表中
 all_text = ''.join(map(str, train_data['review']))
 chars = set(all_text)
 
-# 定义特殊标记
-special_tokens = ['<pad>', '<unk>']
-
-# 创建字符到ID的映射
-vocab = {char: idx for idx, char in enumerate(special_tokens)}
-start_idx = len(vocab)
-for idx, char in enumerate(chars, start=start_idx):
-    vocab[char] = idx
+# 添加新字符到词汇表
+max_id = max(vocab.values())
+for char in chars:
+    if char not in vocab:
+        max_id += 1
+        vocab[char] = max_id
 
 # 生成反向映射
 id2char = {idx: char for char, idx in vocab.items()}
 
-# 保存词汇表和映射
+# 保存扩展后的词汇表和映射
 with open('./data/emotion_vocab.json', 'w', encoding='utf-8') as f:
     json.dump(vocab, f, ensure_ascii=False)
 
@@ -53,3 +54,4 @@ with open('./data/emotion_id2char.json', 'w', encoding='utf-8') as f:
     json.dump(id2char, f, ensure_ascii=False)
 
 print("情感数据的词汇表和映射已保存。")
+print(f"词汇表大小: {len(vocab)}")

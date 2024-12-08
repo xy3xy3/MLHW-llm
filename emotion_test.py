@@ -11,7 +11,10 @@ class EmotionTestDataset(Dataset):
         # 加载词汇表
         with open(vocab_path, 'r', encoding='utf-8') as f:
             self.vocab = json.load(f)
-        self.data = pd.read_csv(csv_file)
+        # 读取CSV文件，并指定数据类型
+        self.data = pd.read_csv(csv_file, dtype={'review': str, 'label': int})
+        # 填充缺失值
+        self.data['review'] = self.data['review'].fillna('')
         self.max_length = max_length
 
     def __len__(self):
@@ -20,6 +23,9 @@ class EmotionTestDataset(Dataset):
     def __getitem__(self, idx):
         text = self.data.loc[idx, 'review']
         label = self.data.loc[idx, 'label']
+        # 确保text是字符串类型
+        if not isinstance(text, str):
+            text = str(text)
         # 将文本转换为索引
         tokens = [self.vocab.get(char, self.vocab['<unk>']) for char in text]
         # 截断或填充
@@ -46,7 +52,7 @@ def evaluate_model(model, test_loader, device):
             correct += (predicted == y).sum().item()
 
     accuracy = 100 * correct / total
-    print(f'Test Accuracy: {accuracy:.2f}%')
+    return accuracy
 
 def main():
     BATCH_SIZE = 32
