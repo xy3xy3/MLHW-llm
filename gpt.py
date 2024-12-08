@@ -183,7 +183,7 @@ def main():
     D_FF = 1024  # 前馈神经网络的隐藏层维度
     DROPOUT = 0.1  # Dropout的概率
     LEARNING_RATE = 0.0001  # 学习率
-    NUM_EPOCHS = 300  # 训练的轮数
+    NUM_EPOCHS = 50  # 训练的轮数
 
     # 加载数据
     dataset = TextDataset('./data/train.txt', './data/vocab.json')
