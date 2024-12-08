@@ -69,11 +69,12 @@ def main():
     # 加载微调后的模型
     model = GPT(len(vocab)).to(device)
     model.classifier = nn.Linear(model.out.out_features, 2).to(device)
-    checkpoint = torch.load('emotion_checkpoints/your_checkpoint.pt', map_location=device)
+    checkpoint = torch.load('emotion_checkpoints/epoch_2-loss_0.7074-train_acc_57.48-test_acc_58.40.pt', map_location=device)
     model.load_state_dict(checkpoint['model_state_dict'])
 
     # 评估模型
-    evaluate_model(model, test_loader, device)
+    res = evaluate_model(model, test_loader, device)
+    print(f"Test accuracy: {res:.2f}%")
 
 if __name__ == '__main__':
     main()

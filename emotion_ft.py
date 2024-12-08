@@ -72,6 +72,16 @@ def train_model(model, train_loader, test_loader, optimizer, criterion, device, 
 
     saved_checkpoints = []
     test_accuracies = []
+    # 从已有检查点恢复
+    checkpoint_files = [f for f in os.listdir(save_dir) if f.endswith('.pt')]
+    if checkpoint_files and start_epoch == 0:
+        latest_checkpoint = max(checkpoint_files, key=lambda x: int(x.split('_')[1].split('-')[0]))
+        checkpoint_path = os.path.join(save_dir, latest_checkpoint)
+        checkpoint = torch.load(checkpoint_path,weights_only=True)
+        model.load_state_dict(checkpoint['model_state_dict'])
+        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        start_epoch = checkpoint['epoch'] + 1
+        print(f'Resuming from epoch {start_epoch}')
 
     model.train()
     for epoch in range(start_epoch, num_epochs):
@@ -133,7 +143,7 @@ def load_pretrained_model(model, checkpoint_path, device):
     """
     加载预训练模型权重，并处理词汇表扩展的情况
     """
-    checkpoint = torch.load(checkpoint_path, map_location=device)
+    checkpoint = torch.load(checkpoint_path, map_location=device,weights_only=True)
     pretrained_dict = checkpoint['model_state_dict']
     model_dict = model.state_dict()
 
@@ -171,7 +181,8 @@ def main():
 
     test_dataset = EmotionTestDataset('./data/emotion_test.csv', './data/emotion_vocab.json')
     test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False)
-
+    print(f"Train set size: {len(train_loader.dataset)}")
+    print(f"Test set size: {len(test_loader.dataset)}")
     # 加载词汇表
     with open('./data/emotion_vocab.json', 'r', encoding='utf-8') as f:
         vocab = json.load(f)
