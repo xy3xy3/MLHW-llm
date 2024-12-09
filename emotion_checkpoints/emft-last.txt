@@ -1,0 +1,40 @@
+Epoch 0 completed. Average loss: 1.1526, Training Accuracy: 52.44%
+Epoch 0 Test Accuracy: 62.20%
+Epoch 1 completed. Average loss: 0.6606, Training Accuracy: 59.55%
+Epoch 1 Test Accuracy: 67.00%
+Epoch 2 completed. Average loss: 0.6352, Training Accuracy: 63.68%
+Epoch 2 Test Accuracy: 66.60%
+Epoch 3 completed. Average loss: 0.6139, Training Accuracy: 66.80%
+Epoch 3 Test Accuracy: 67.20%
+Epoch 4 completed. Average loss: 0.5941, Training Accuracy: 69.02%
+Epoch 4 Test Accuracy: 70.60%
+Epoch 5 completed. Average loss: 0.5738, Training Accuracy: 70.27%
+Epoch 5 Test Accuracy: 73.60%
+Epoch 6 completed. Average loss: 0.5568, Training Accuracy: 72.66%
+Epoch 6 Test Accuracy: 73.00%
+Epoch 7 completed. Average loss: 0.5203, Training Accuracy: 75.26%
+Epoch 7 Test Accuracy: 75.00%
+Epoch 8 completed. Average loss: 0.4690, Training Accuracy: 78.48%
+Epoch 8 Test Accuracy: 74.60%
+Epoch 9 completed. Average loss: 0.4615, Training Accuracy: 78.11%
+Epoch 9 Test Accuracy: 76.60%
+Epoch 10 completed. Average loss: 0.4471, Training Accuracy: 79.75%
+Epoch 10 Test Accuracy: 76.00%
+Epoch 11 completed. Average loss: 0.4442, Training Accuracy: 79.94%
+Epoch 11 Test Accuracy: 77.60%
+Epoch 12 completed. Average loss: 0.4284, Training Accuracy: 80.35%
+Epoch 12 Test Accuracy: 77.20%
+Epoch 13 completed. Average loss: 0.4195, Training Accuracy: 81.24%
+Epoch 13 Test Accuracy: 78.00%
+Epoch 14 completed. Average loss: 0.4087, Training Accuracy: 81.24%
+Epoch 14 Test Accuracy: 76.00%
+Epoch 15 completed. Average loss: 0.4049, Training Accuracy: 81.83%
+Epoch 15 Test Accuracy: 79.00%
+Epoch 16 completed. Average loss: 0.3960, Training Accuracy: 82.60%
+Epoch 16 Test Accuracy: 78.20%
+Epoch 17 completed. Average loss: 0.3893, Training Accuracy: 82.24%
+Epoch 17 Test Accuracy: 79.20%
+Epoch 18 completed. Average loss: 0.3781, Training Accuracy: 82.99%
+Epoch 18 Test Accuracy: 78.80%
+Epoch 19 completed. Average loss: 0.3751, Training Accuracy: 83.68%
+Epoch 19 Test Accuracy: 79.80%

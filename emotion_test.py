@@ -8,12 +8,9 @@ from gpt import GPT
 # 定义测试数据集类
 class EmotionTestDataset(Dataset):
     def __init__(self, csv_file, vocab_path, max_length=512):
-        # 加载词汇表
         with open(vocab_path, 'r', encoding='utf-8') as f:
             self.vocab = json.load(f)
-        # 读取CSV文件，并指定数据类型
         self.data = pd.read_csv(csv_file, dtype={'review': str, 'label': int})
-        # 填充缺失值
         self.data['review'] = self.data['review'].fillna('')
         self.max_length = max_length
 
@@ -23,18 +20,15 @@ class EmotionTestDataset(Dataset):
     def __getitem__(self, idx):
         text = self.data.loc[idx, 'review']
         label = self.data.loc[idx, 'label']
-        # 确保text是字符串类型
         if not isinstance(text, str):
             text = str(text)
-        # 将文本转换为索引
         tokens = [self.vocab.get(char, self.vocab['<unk>']) for char in text]
-        # 截断或填充
         if len(tokens) > self.max_length:
             tokens = tokens[:self.max_length]
         else:
             tokens += [self.vocab['<pad>']] * (self.max_length - len(tokens))
         input_ids = torch.tensor(tokens)
-        label = torch.tensor(label, dtype=torch.long)
+        label = torch.tensor(label, dtype=torch.float)
         return input_ids, label
 
 def evaluate_model(model, test_loader, device):
@@ -45,13 +39,13 @@ def evaluate_model(model, test_loader, device):
         for x, y in test_loader:
             x, y = x.to(device), y.to(device)
             outputs = model(x)
-            logits = outputs[:, 0, :]
-            pred = model.classifier(logits)
-            _, predicted = torch.max(pred.data, 1)
+            pooled_output = torch.mean(outputs, dim=1)
+            pred = model.classifier(pooled_output)
+            predicted = (torch.sigmoid(pred) > 0.5).float()
             total += y.size(0)
-            correct += (predicted == y).sum().item()
-
+            correct += (predicted.squeeze() == y).sum().item()
     accuracy = 100 * correct / total
+    print(f'Accuracy on test set: {accuracy:.2f}%')
     return accuracy
 
 def main():
@@ -68,8 +62,11 @@ def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     # 加载微调后的模型
     model = GPT(len(vocab)).to(device)
-    model.classifier = nn.Linear(model.out.out_features, 2).to(device)
-    checkpoint = torch.load('emotion_checkpoints/epoch_2-loss_0.7074-train_acc_57.48-test_acc_58.40.pt', map_location=device)
+    model.classifier = nn.Sequential(
+        nn.Dropout(0.5),
+        nn.Linear(model.out.out_features, 1)
+    ).to(device)
+    checkpoint = torch.load('emotion_checkpoints/last.pt', map_location=device,weights_only=True)
     model.load_state_dict(checkpoint['model_state_dict'])
 
     # 评估模型

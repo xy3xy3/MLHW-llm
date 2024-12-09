@@ -9,6 +9,9 @@ with open('./data/vocab.json', 'r', encoding='utf-8') as f:
 # 读取数据
 data = pd.read_csv('./data/ChnSentiCorp_htl_all.csv')
 
+# 去掉包含缺失值的样本
+data = data.dropna(subset=['review', 'label']).reset_index(drop=True)
+
 # 打乱数据
 data = shuffle(data, random_state=42).reset_index(drop=True)
 
@@ -16,21 +19,32 @@ data = shuffle(data, random_state=42).reset_index(drop=True)
 data_0 = data[data['label'] == 0].reset_index(drop=True)
 data_1 = data[data['label'] == 1].reset_index(drop=True)
 
-# 保留最后250条0和1的数据作为测试集
-test_data_0 = data_0.tail(250)
-test_data_1 = data_1.tail(250)
+# 取数量较少的一类的数量
+n_samples = min(len(data_0), len(data_1))
+
+# 从两类中各取n_samples条数据
+balanced_data_0 = data_0.head(n_samples)
+balanced_data_1 = data_1.head(n_samples)
+
+# 合并为平衡数据集
+balanced_data = pd.concat([balanced_data_0, balanced_data_1], ignore_index=True)
+
+# 从平衡数据集中随机选择250个正样本和250个负样本作为测试集
+test_data_0 = balanced_data_0.sample(n=250, random_state=42)
+test_data_1 = balanced_data_1.sample(n=250, random_state=42)
 test_data = pd.concat([test_data_0, test_data_1], ignore_index=True)
 
-# 将测试集保存为CSV文件
-test_data.to_csv('./data/emotion_test.csv', index=False)
-
-# 剩余的数据作为训练集，各取3000条0和1的数据
-train_data_0 = data_0.head(3000)
-train_data_1 = data_1.head(3000)
+# 剩余的数据作为训练集
+train_data_0 = balanced_data_0.drop(test_data_0.index).reset_index(drop=True)
+train_data_1 = balanced_data_1.drop(test_data_1.index).reset_index(drop=True)
 train_data = pd.concat([train_data_0, train_data_1], ignore_index=True)
 
-# 保存训练集
+print(f"每类训练样本数量: {len(train_data_0)}")
+print(f"每类测试样本数量: {len(test_data_0)}")
+
+# 保存训练集和测试集
 train_data.to_csv('./data/emotion_train.csv', index=False)
+test_data.to_csv('./data/emotion_test.csv', index=False)
 
 # 扩展词汇表：将情感数据集中的新字符添加到现有词汇表中
 all_text = ''.join(map(str, train_data['review']))
